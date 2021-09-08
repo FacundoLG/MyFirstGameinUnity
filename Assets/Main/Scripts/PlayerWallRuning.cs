@@ -11,6 +11,7 @@ public class PlayerWallRuning : MonoBehaviour
     [Header("Detections")]
     [SerializeField] private float wallDistance = .5f;
     [SerializeField] private float minimumJumpHeight = 1.5f;
+    [SerializeField] private float minimumVelocity = 1.5f;
     [Header("wall Runing")]
     [SerializeField] private float WallRunGravity;
     [SerializeField] private float WallRunJumpForce;
@@ -37,26 +38,24 @@ public class PlayerWallRuning : MonoBehaviour
         wallRight = Physics.Raycast(PlayerBody.transform.position, PlayerBody.transform.right, out rightWallHit, wallDistance);
     }
     bool CanWallRun() {
+       
         return !Physics.Raycast(PlayerBody.transform.position, Vector3.down, minimumJumpHeight);
     }
     void Update()
     {
-         
+        Debug.Log(PlayerBody.velocity - new Vector3(0, PlayerBody.velocity.y, 0));
         CheckWall();
         if (CanWallRun()) {
             if (wallLeft) {
                 StartWallRuning();
-                Debug.Log("Wallruning on the left");
             }else if (wallRight) {
                 StartWallRuning();
-                Debug.Log("Wallruning on the right");
             } else {
                 StopWallRuning();
             }
         } else {
             StopWallRuning();
         }
-        
     }
 
 
@@ -69,21 +68,20 @@ public class PlayerWallRuning : MonoBehaviour
             tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
         } 
 
-
+       
         if (Input.GetKeyDown(KeyCode.Space)) {
             if (wallLeft) {
-                Vector3 wallRunJumpDirection = transform.up + PlayerCamera.transform.forward * 0.3f + leftWallHit.normal * 0.7f;
+                Vector3 wallRunJumpDirection = transform.up + PlayerCamera.transform.forward * 0.5f + leftWallHit.normal * 0.2f;
                 PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
                 PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
             } else if (wallRight) {
-                Vector3 wallRunJumpDirection = transform.up + PlayerCamera.transform.forward * 0.3f + rightWallHit.normal * 0.77f;
+                Vector3 wallRunJumpDirection = transform.up + PlayerCamera.transform.forward * 0.5f + rightWallHit.normal * 0.2f;
                 PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
                 PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
             }
             StartCoroutine(WallRunDelay());
-            //PlayerBody.AddForce(PlayerBody.transform.up * WallRunJumpForce, ForceMode.Impulse);
         } else if(isWallRunEnd){
-           PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0.1f, PlayerBody.velocity.z);
+           PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0f, PlayerBody.velocity.z);
         }
         
     }
@@ -96,7 +94,7 @@ public class PlayerWallRuning : MonoBehaviour
     }
     IEnumerator WallRunDelay() {
         isWallRunEnd = false;
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         isWallRunEnd = true;
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerControler : MonoBehaviour {
     [Header("Components")]
     [SerializeField] private Transform PlayerCamera;
+    [SerializeField] private Transform Orientation; 
     [SerializeField] private Rigidbody PlayerBody;
     [SerializeField] private CapsuleCollider Collider;
     [SerializeField] private PlayerWallRuning wallRun;
@@ -44,7 +45,7 @@ public class PlayerControler : MonoBehaviour {
         verticalMovement = Input.GetAxis("Vertical");
         PlayerMouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
         
-        moveDirection = PlayerBody.transform.forward * verticalMovement + PlayerBody.transform.right * horizontalMovement;
+        moveDirection = Orientation.transform.forward * verticalMovement + Orientation.transform.right * horizontalMovement;
 
         isInTheAir = !Physics.Raycast(PlayerBody.transform.position, Vector3.down, height / 2 + 0.08f); 
         if(Input.GetKeyDown(KeyCode.Space) && !isInTheAir) {
@@ -88,8 +89,10 @@ public class PlayerControler : MonoBehaviour {
 
         YRotation += Xinput * Sensitivty;
         XRotation -= Yinput * Sensitivty;
-        PlayerCamera.transform.localRotation = Quaternion.Euler(XRotation, 0, wallRun.tilt);
-        PlayerBody.transform.rotation = Quaternion.Euler(0, YRotation, 0);
+        PlayerCamera.transform.localRotation = Quaternion.Euler(XRotation, YRotation, wallRun.tilt);
+        PlayerCamera.position = Orientation.position;
+        Orientation.transform.rotation = Quaternion.Euler(0, YRotation, 0);
+        PlayerBody.rotation = Orientation.rotation;
     }
     private void Jump() {
         PlayerBody.AddForce(PlayerBody.transform.up * Jumpforce, ForceMode.Impulse);

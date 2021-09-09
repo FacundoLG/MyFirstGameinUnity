@@ -7,14 +7,17 @@ public class PlayerWallRuning : MonoBehaviour
     [Header("Components")]
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private Rigidbody PlayerBody;
+    [SerializeField] private Transform Orientation;
+
     [SerializeField] private CapsuleCollider Collider;
     [Header("Detections")]
     [SerializeField] private float wallDistance = .5f;
     [SerializeField] private float minimumJumpHeight = 1.5f;
     [SerializeField] private float minimumVelocity = 1.5f;
     [Header("wall Runing")]
-    [SerializeField] private float WallRunGravity;
     [SerializeField] private float WallRunJumpForce;
+    [SerializeField] private float MaxVelocity;
+
     [Header("Camera")]
     [SerializeField] private float fov = 80;
     [SerializeField] private float wallRunfov = 100;
@@ -34,8 +37,8 @@ public class PlayerWallRuning : MonoBehaviour
 
     // Update is called once per frame
     void CheckWall() {
-        wallLeft = Physics.Raycast(PlayerBody.transform.position, -PlayerBody.transform.right, out leftWallHit, wallDistance);
-        wallRight = Physics.Raycast(PlayerBody.transform.position, PlayerBody.transform.right, out rightWallHit, wallDistance);
+        wallLeft = Physics.Raycast(Orientation.transform.position, -Orientation.transform.right, out leftWallHit, wallDistance);
+        wallRight = Physics.Raycast(Orientation.transform.position, Orientation.transform.right, out rightWallHit, wallDistance);
     }
     bool CanWallRun() {
        
@@ -43,7 +46,7 @@ public class PlayerWallRuning : MonoBehaviour
     }
     void Update()
     {
-        //Debug.Log(PlayerBody.velocity - new Vector3(0, PlayerBody.velocity.y, 0));
+        Debug.Log(PlayerBody.velocity.magnitude);
         CheckWall();
         if (CanWallRun()) {
             if (wallLeft) {
@@ -71,13 +74,16 @@ public class PlayerWallRuning : MonoBehaviour
        
         if (Input.GetKeyDown(KeyCode.Space)) {
             if (wallLeft) {
-                Vector3 wallRunJumpDirection = transform.up + PlayerCamera.transform.forward * 0.5f + leftWallHit.normal * 0.2f;
+                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal ;
                 PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
                 PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
             } else if (wallRight) {
-                Vector3 wallRunJumpDirection = transform.up + PlayerCamera.transform.forward * 0.5f + rightWallHit.normal * 0.2f;
+                Vector3 wallRunJumpDirection = transform.up  + rightWallHit.normal ;
                 PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
                 PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
+            }
+            if(wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
+                PlayerBody.AddForce(PlayerCamera.transform.forward * 0.5f * WallRunJumpForce * 100, ForceMode.Force);
             }
             StartCoroutine(WallRunDelay());
         } else if(isWallRunEnd){

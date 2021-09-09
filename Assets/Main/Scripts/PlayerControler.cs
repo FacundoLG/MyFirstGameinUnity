@@ -40,6 +40,7 @@ public class PlayerControler : MonoBehaviour {
     }
 
     private void Update() {
+        
         // Input Maping
         horizontalMovement = Input.GetAxis("Horizontal");
         verticalMovement = Input.GetAxis("Vertical");
@@ -92,7 +93,6 @@ public class PlayerControler : MonoBehaviour {
         PlayerCamera.transform.localRotation = Quaternion.Euler(XRotation, YRotation, wallRun.tilt);
         PlayerCamera.position = Orientation.position;
         Orientation.transform.rotation = Quaternion.Euler(0, YRotation, 0);
-        PlayerBody.rotation = Orientation.rotation;
     }
     private void Jump() {
         PlayerBody.AddForce(PlayerBody.transform.up * Jumpforce, ForceMode.Impulse);

@@ -43,7 +43,7 @@ public class PlayerWallRuning : MonoBehaviour
     }
     void Update()
     {
-        Debug.Log(PlayerBody.velocity - new Vector3(0, PlayerBody.velocity.y, 0));
+        //Debug.Log(PlayerBody.velocity - new Vector3(0, PlayerBody.velocity.y, 0));
         CheckWall();
         if (CanWallRun()) {
             if (wallLeft) {

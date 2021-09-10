@@ -2,13 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerWallRuning : MonoBehaviour
-{
+public class PlayerWallRuning : MonoBehaviour {
     [Header("Components")]
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private Rigidbody PlayerBody;
     [SerializeField] private Transform Orientation;
-
     [SerializeField] private CapsuleCollider Collider;
     [Header("Detections")]
     [SerializeField] private float wallDistance = .5f;
@@ -24,15 +22,18 @@ public class PlayerWallRuning : MonoBehaviour
     [SerializeField] private float wallRunfovTime;
     [SerializeField] private float camTilt;
     [SerializeField] private float camTiltTime;
-    public float tilt;
     private Vector3 PlayerVelocity;
     bool wallLeft = false;
     bool wallRight = false;
-    bool isWallRunEnd = true;
+    //Exported
+    public float tilt;
+    public Quaternion wallAngle;
+    public bool isWallRuning;
+
+    public bool isWallRunEnd;
     RaycastHit leftWallHit, rightWallHit;
-    void Start()
-    {
-        
+    void Start() {
+
     }
 
     // Update is called once per frame
@@ -46,66 +47,82 @@ public class PlayerWallRuning : MonoBehaviour
         }
         return !Physics.Raycast(PlayerBody.transform.position, Vector3.down, minimumJumpHeight);
     }
-    void Update()
-    {
-        PlayerVelocity = PlayerBody.velocity - new Vector3(0,PlayerBody.velocity.y,0);
-        Debug.Log(PlayerVelocity.magnitude);
+    void Update() {
         CheckWall();
-        if (CanWallRun()) {
-            if (wallLeft) {
-                StartWallRuning();
-            }else if (wallRight) {
-                StartWallRuning();
-            } else {
-                StopWallRuning();
-            }
-        } else {
-            StopWallRuning();
-        }
-    }
 
+        if (leftWallHit.collider) {
+            isWallRuning = true;
+            wallAngle = leftWallHit.transform.localRotation; 
+        Debug.Log(wallAngle);
 
-    void StartWallRuning() {
-        PlayerBody.useGravity = false;
-        PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime);
-        if (wallLeft) {
-            tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime);
-        } else if (wallRight) {
-            tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
-        }
-        if (wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
-            PlayerBody.AddForce(Orientation.transform.forward * WallRunJumpForce * 0.5f * Time.deltaTime, ForceMode.Acceleration);
+        }else if (rightWallHit.collider) {
+            isWallRuning = true;
+            wallAngle = rightWallHit.transform.localRotation;
+        Debug.Log(wallAngle);
+        }else if (Input.GetKeyDown(KeyCode.Space)) {
+            isWallRuning = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            if (wallLeft) {
-                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal ;
-                PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
-                PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
-            } else if (wallRight) {
-                Vector3 wallRunJumpDirection = transform.up  + rightWallHit.normal ;
-                PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
-                PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
-            }
-            if(wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
-                PlayerBody.AddForce(PlayerCamera.transform.forward * 0.5f * WallRunJumpForce * 100, ForceMode.Force);
-            }
-            StartCoroutine(WallRunDelay());
-        } else if(isWallRunEnd){
-           PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0f, PlayerBody.velocity.z);
-        }
-        
-    }
-    void StopWallRuning() {
-        PlayerBody.useGravity = true;
-        isWallRunEnd = true;
-        PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, fov, wallRunfovTime * Time.deltaTime);
-        tilt = Mathf.Lerp(tilt, 0, camTiltTime * Time.deltaTime);
 
-    }
-    IEnumerator WallRunDelay() {
-        isWallRunEnd = false;
-        yield return new WaitForSeconds(1);
-        isWallRunEnd = true;
     }
 }
+     //    PlayerVelocity = PlayerBody.velocity - new Vector3(0,PlayerBody.velocity.y,0);
+     //    if (CanWallRun()) {
+     //        if (wallLeft) {
+     //            StartWallRuning();
+     //        }else if (wallRight) {
+     //            StartWallRuning();
+     //        } else {
+     //            StopWallRuning();
+     //        }
+     //    } else {
+     //        StopWallRuning();
+     //    }
+     //}
+
+
+//void StartWallRuning() {
+//    isWallRuning = true;
+//    PlayerBody.useGravity = false;
+//    PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime);
+//    if (wallLeft) {
+//        tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime);
+//    } else if (wallRight) {
+//        tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
+//    }
+//    if (wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
+//        PlayerBody.AddForce(Orientation.transform.forward * WallRunJumpForce * 0.5f * Time.deltaTime, ForceMode.Acceleration);
+//    }
+
+//    if (Input.GetKeyDown(KeyCode.Space)) {
+//        if (wallLeft) {
+//            Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal ;
+//            PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
+//            PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
+//        } else if (wallRight) {
+//            Vector3 wallRunJumpDirection = transform.up  + rightWallHit.normal ;
+//            PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
+//            PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
+//        }
+//        if(wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
+//            PlayerBody.AddForce(PlayerCamera.transform.forward * 0.5f * WallRunJumpForce * 100, ForceMode.Force);
+//        }
+//        StartCoroutine(WallRunDelay());
+//    } else if(isWallRunEnd){
+//       PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0f, PlayerBody.velocity.z);
+//    }
+
+//}
+//void StopWallRuning() {
+//    PlayerBody.useGravity = true;
+//    isWallRunEnd = true;
+//    PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, fov, wallRunfovTime * Time.deltaTime);
+//    tilt = Mathf.Lerp(tilt, 0, camTiltTime * Time.deltaTime);
+
+//}
+//IEnumerator WallRunDelay() {
+//    isWallRunEnd = false;
+//    yield return new WaitForSeconds(1);
+//    isWallRunEnd = true;
+
+//}

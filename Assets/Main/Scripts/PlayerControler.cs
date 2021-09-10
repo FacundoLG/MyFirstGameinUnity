@@ -46,7 +46,6 @@ public class PlayerControler : MonoBehaviour {
         verticalMovement = Input.GetAxis("Vertical");
         PlayerMouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
         
-        moveDirection = Orientation.transform.forward * verticalMovement + Orientation.transform.right * horizontalMovement;
 
         isInTheAir = !Physics.Raycast(PlayerBody.transform.position, Vector3.down, height / 2 + 0.08f); 
         if(Input.GetKeyDown(KeyCode.Space) && !isInTheAir) {
@@ -54,11 +53,18 @@ public class PlayerControler : MonoBehaviour {
         }
         ControlDrag();
         ControlSpeed();
-        MovePlayerCamera();
+        if (wallRun.isWallRuning) {
+            Debug.Log("walling");
+            Orientation.rotation = wallRun.wallAngle  ;
+        } else {
+            Debug.Log("false");
+            MovePlayerCamera();
+        }
+        PlayerCamera.position = Orientation.position;
+
+        moveDirection = Orientation.transform.forward * verticalMovement + Orientation.transform.right * horizontalMovement;
     }
     private void FixedUpdate() {
-
-
         MovePlayer();
     }
     private void ControlDrag() {
@@ -91,7 +97,6 @@ public class PlayerControler : MonoBehaviour {
         YRotation += Xinput * Sensitivty;
         XRotation -= Yinput * Sensitivty;
         PlayerCamera.transform.localRotation = Quaternion.Euler(XRotation, YRotation, wallRun.tilt);
-        PlayerCamera.position = Orientation.position;
         Orientation.transform.rotation = Quaternion.Euler(0, YRotation, 0);
     }
     private void Jump() {

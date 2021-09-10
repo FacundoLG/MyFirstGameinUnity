@@ -6,7 +6,6 @@ public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator Animator;
     [SerializeField] private float AttakingOffset;
-    private bool isAtacking = true;
     
     private float timeValue;
     private void Start() {
@@ -16,14 +15,9 @@ public class PlayerAnimator : MonoBehaviour
         timeValue -= Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.F)) {
-            if (!Animator.GetBool("LoEstaCriticando")) {
-                Animator.SetBool("LoEstaCriticando", true);
-            } else {
-                Animator.SetBool("LoEstaCriticando", false);
-            }
+                Animator.SetTrigger("Inspect");
         }
         if (Input.GetMouseButtonDown(0)) {
-            isAtacking = true;
             timeValue = AttakingOffset;
         }
         if (Input.GetMouseButtonDown(0) && Animator.GetInteger("Atack") >= 1) {

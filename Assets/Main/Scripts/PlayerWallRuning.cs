@@ -25,7 +25,7 @@ public class PlayerWallRuning : MonoBehaviour
     [SerializeField] private float camTilt;
     [SerializeField] private float camTiltTime;
     public float tilt;
-
+    private Vector3 PlayerVelocity;
     bool wallLeft = false;
     bool wallRight = false;
     bool isWallRunEnd = true;
@@ -41,12 +41,15 @@ public class PlayerWallRuning : MonoBehaviour
         wallRight = Physics.Raycast(Orientation.transform.position, Orientation.transform.right, out rightWallHit, wallDistance);
     }
     bool CanWallRun() {
-       
+        if (PlayerVelocity.magnitude < minimumVelocity) {
+            return false;
+        }
         return !Physics.Raycast(PlayerBody.transform.position, Vector3.down, minimumJumpHeight);
     }
     void Update()
     {
-        Debug.Log(PlayerBody.velocity.magnitude);
+        PlayerVelocity = PlayerBody.velocity - new Vector3(0,PlayerBody.velocity.y,0);
+        Debug.Log(PlayerVelocity.magnitude);
         CheckWall();
         if (CanWallRun()) {
             if (wallLeft) {
@@ -69,9 +72,11 @@ public class PlayerWallRuning : MonoBehaviour
             tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime);
         } else if (wallRight) {
             tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
-        } 
+        }
+        if (wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
+            PlayerBody.AddForce(Orientation.transform.forward * WallRunJumpForce * 0.5f * Time.deltaTime, ForceMode.Acceleration);
+        }
 
-       
         if (Input.GetKeyDown(KeyCode.Space)) {
             if (wallLeft) {
                 Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal ;

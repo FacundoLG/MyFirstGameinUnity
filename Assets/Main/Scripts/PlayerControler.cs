@@ -53,13 +53,11 @@ public class PlayerControler : MonoBehaviour {
         }
         ControlDrag();
         ControlSpeed();
-        if (wallRun.isWallRuning) {
-            Debug.Log("walling");
-            Orientation.rotation = wallRun.wallAngle  ;
-        } else {
-            Debug.Log("false");
-            MovePlayerCamera();
+        if (!wallRun.isWallRuning) {
+            Orientation.transform.rotation = Quaternion.Euler(0, YRotation, 0);
         }
+        MovePlayerCamera();
+
         PlayerCamera.position = Orientation.position;
 
         moveDirection = Orientation.transform.forward * verticalMovement + Orientation.transform.right * horizontalMovement;
@@ -97,7 +95,6 @@ public class PlayerControler : MonoBehaviour {
         YRotation += Xinput * Sensitivty;
         XRotation -= Yinput * Sensitivty;
         PlayerCamera.transform.localRotation = Quaternion.Euler(XRotation, YRotation, wallRun.tilt);
-        Orientation.transform.rotation = Quaternion.Euler(0, YRotation, 0);
     }
     private void Jump() {
         PlayerBody.AddForce(PlayerBody.transform.up * Jumpforce, ForceMode.Impulse);

@@ -26,7 +26,7 @@ public class PlayerControler : MonoBehaviour {
     private Vector3 moveDirection;
     private Vector2 PlayerMouseInput;
     private float height,Velocity,horizontalMovement,verticalMovement;
-    private bool isScaling, isWallRuning, isInTheAir;
+    public bool isScaling, isWallRuning, isInTheAir;
  
     private float XRotation,YRotation;
     private float Xinput, Yinput;

@@ -24,8 +24,8 @@ public class PlayerWallRuning : MonoBehaviour {
     [SerializeField] private float camTiltTime;
     private Vector3 PlayerVelocity;
     public float Delta;
-    bool wallLeft = false;
-    bool wallRight = false;
+    public bool wallLeft = false;
+    public bool wallRight = false;
     private float toFixAngle;
     //Exported
     public float tilt;
@@ -50,7 +50,6 @@ public class PlayerWallRuning : MonoBehaviour {
     }
     void Update() {
         wallRunDelay -= Delta;
-        Debug.Log(wallRunDelay);
         Delta = Time.deltaTime;
         PlayerVelocity = PlayerBody.velocity - new Vector3(0,PlayerBody.velocity.y,0);
         
@@ -102,16 +101,16 @@ public class PlayerWallRuning : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space)) {
             wallRunDelay = 1;
             if (wallLeft) {
-                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal;
+                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal * 0.5f;
                 //PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
                 PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
             } else if (wallRight) {
-                Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal;
+                Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal * 0.5f;
                 //PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0, PlayerBody.velocity.z);
                 PlayerBody.AddForce(wallRunJumpDirection * WallRunJumpForce * 100, ForceMode.Force);
             }
             if (wallLeft || wallRight && PlayerBody.velocity.magnitude <= MaxVelocity) {
-            PlayerBody.AddForce(PlayerCamera.transform.forward * WallRunJumpForce * 0.5f * Time.deltaTime, ForceMode.Acceleration);
+            PlayerBody.AddForce(PlayerCamera.transform.forward * WallRunJumpForce * 0.7f * Time.deltaTime, ForceMode.Acceleration);
             }
         } else if (wallRunDelay <= 0){
             PlayerBody.velocity = new Vector3(PlayerBody.velocity.x, 0f, PlayerBody.velocity.z);

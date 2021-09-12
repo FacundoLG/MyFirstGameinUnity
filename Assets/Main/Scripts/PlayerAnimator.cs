@@ -6,14 +6,36 @@ public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator Animator;
     [SerializeField] private float AttakingOffset;
-    
+    [SerializeField] private PlayerWallRuning wallRun;
+    [SerializeField] private PlayerControler playerControler;
     private float timeValue;
     private void Start() {
         timeValue = AttakingOffset;
     }
     void Update() {
         timeValue -= Time.deltaTime;
+        //Env Animations
+        if (wallRun.isWallRuning) {
 
+            if (wallRun.wallLeft) {
+                Animator.SetBool("WallRunL",true);
+            } else if (wallRun.wallRight) {
+                Animator.SetBool("WallRunR",true);
+            }
+        } else {
+            Animator.SetBool("WallRunR", false);
+            Animator.SetBool("WallRunL", false);
+
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && !playerControler.isInTheAir) {
+            Animator.SetBool("IsRuning", true);
+        } else {
+            Animator.SetBool("IsRuning", false);
+        }
+
+
+
+        //KeysTrigerAnimations
         if (Input.GetKeyDown(KeyCode.F)) {
                 Animator.SetTrigger("Inspect");
         }

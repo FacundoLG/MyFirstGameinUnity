@@ -25,8 +25,8 @@ public class PlayerControler : MonoBehaviour {
 
     private Vector3 moveDirection;
     private Vector2 PlayerMouseInput;
-    private float height,Velocity,horizontalMovement,verticalMovement;
-    public bool isScaling, isWallRuning, isInTheAir;
+    private float height,Velocity,horizontalMovement,verticalMovement,dashDelay;
+    public bool isScaling, isWallRuning, isInTheAir,canreDash;
  
     private float XRotation,YRotation;
     private float Xinput, Yinput;
@@ -37,6 +37,7 @@ public class PlayerControler : MonoBehaviour {
         height = Collider.height;
 
         PlayerBody.freezeRotation = true;
+
     }
 
     private void Update() {
@@ -47,20 +48,35 @@ public class PlayerControler : MonoBehaviour {
         PlayerMouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
         
 
-        isInTheAir = !Physics.Raycast(PlayerBody.transform.position, Vector3.down, height / 2 + 0.08f); 
-        if(Input.GetKeyDown(KeyCode.Space) && !isInTheAir) {
-            Jump();
+        isInTheAir = !Physics.Raycast(PlayerBody.transform.position, Vector3.down, height / 2 + 0.08f);
+        if (!isInTheAir) {
+            canreDash = true;
         }
-        ControlDrag();
-        ControlSpeed();
         if (!wallRun.isWallRuning) {
             Orientation.transform.rotation = Quaternion.Euler(0, YRotation, 0);
         }
+        if (wallRun.isWallRuning) {
+            canreDash = true;
+
+        }
+
+        ControlDrag();
+        ControlSpeed();
         MovePlayerCamera();
+
+        
 
         PlayerCamera.position = Orientation.position;
 
         moveDirection = Orientation.transform.forward * verticalMovement + Orientation.transform.right * horizontalMovement;
+        if (Input.GetKeyDown(KeyCode.Space) && !isInTheAir) {
+            Jump();
+        }
+        if (Input.GetKeyDown(KeyCode.LeftShift) && isInTheAir) {
+            if (canreDash) {
+                Dash();
+            }
+        }
     }
     private void FixedUpdate() {
         MovePlayer();
@@ -98,5 +114,10 @@ public class PlayerControler : MonoBehaviour {
     }
     private void Jump() {
         PlayerBody.AddForce(PlayerBody.transform.up * Jumpforce, ForceMode.Impulse);
+    }
+    private void Dash() {
+        PlayerBody.velocity = new Vector3(0, 0, 0);
+        PlayerBody.AddForce(PlayerCamera.forward * Jumpforce * 1f,ForceMode.Impulse);
+        canreDash = false;
     }
 }
